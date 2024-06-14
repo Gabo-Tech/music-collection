@@ -1,19 +1,19 @@
 <div *ngIf="loading$ | async" class="text-center mt-4">Loading...</div>
 <ul *ngIf="!(loading$ | async)" class="space-y-4">
   <li
-    *ngFor="let song of songs"
+    *ngFor="let artist of artists"
     class="bg-white shadow-md rounded-lg overflow-hidden"
   >
-    <a [routerLink]="['/songs', song.id]" class="block p-4">
+    <a [routerLink]="['/artists', artist.id]" class="block p-4">
       <div class="flex items-center space-x-4">
         <img
-          [src]="song.poster"
-          alt="{{ song.title }}"
+          [src]="artist.img"
+          alt="{{ artist.name }}"
           class="w-16 h-16 object-cover rounded"
         />
         <div>
-          <h2 class="text-xl font-semibold">{{ song.title }}</h2>
-          <p class="text-sm text-gray-600">{{ song.genre.join(', ') }}</p>
+          <h2 class="text-xl font-semibold">{{ artist.name }}</h2>
+          <p class="text-sm text-gray-600">{{ artist.bornCity }}</p>
         </div>
       </div>
     </a>

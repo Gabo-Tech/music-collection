@@ -1,22 +1,20 @@
 module.exports = {
-    env: {
-      browser: true,
-      es2021: true,
+  preset: 'jest-preset-angular',
+  setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.spec.json',
+      stringifyContentPathRegex: '\\.html$',
     },
-    extends: [
-      'eslint:recommended',
-      'plugin:@typescript-eslint/recommended',
-      'plugin:prettier/recommended',
-    ],
-    parser: '@typescript-eslint/parser',
-    parserOptions: {
-      ecmaVersion: 12,
-      sourceType: 'module',
-    },
-    plugins: ['@typescript-eslint', 'prettier'],
-    rules: {
-      'prettier/prettier': 'error',
-      '@typescript-eslint/no-unused-vars': ['error'],
-    },
-    ignorePatterns: ['dist/', 'node_modules/'],
-  };
+  },
+  transform: {
+    '^.+\\.(ts|js|html)$': 'ts-jest',
+  },
+  transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$)'],
+  moduleFileExtensions: ['ts', 'html', 'js', 'json'],
+  moduleNameMapper: {
+    '@app/(.*)': '<rootDir>/src/app/$1',
+    '@core/(.*)': '<rootDir>/src/app/core/$1',
+    '@env': '<rootDir>/src/environments/environment',
+  },
+};

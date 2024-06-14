@@ -1,0 +1,66 @@
+.hidden {
+  display: none;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.bg-black {
+  background-color: black;
+}
+
+.bg-opacity-75 {
+  background-opacity: 0.75;
+}
+
+.z-50 {
+  z-index: 50;
+}
+
+.bg-gray-800 {
+  background-color: #2d3748;
+}
+
+.text-white {
+  color: white;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.md\:hidden {
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+.md\:flex {
+  @media (min-width: 768px) {
+    display: flex;
+  }
+}
+
+.space-x-4 > :not(:first-child) {
+  margin-left: 1rem;
+}
+
+.space-y-4 > :not(:first-child) {
+  margin-top: 1rem;
+}
+
+.font-bold {
+  font-weight: bold;
+}
