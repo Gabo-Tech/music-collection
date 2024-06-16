@@ -1,21 +1,59 @@
-<div *ngIf="loading$ | async" class="text-center mt-4">Loading...</div>
-<ul *ngIf="!(loading$ | async)" class="space-y-4">
-  <li
-    *ngFor="let song of songs"
-    class="bg-white shadow-md rounded-lg overflow-hidden"
-  >
-    <a [routerLink]="['/songs', song.id]" class="block p-4">
-      <div class="flex items-center space-x-4">
-        <img
-          [src]="song.poster"
-          alt="{{ song.title }}"
-          class="w-16 h-16 object-cover rounded"
-        />
-        <div>
-          <h2 class="text-xl font-semibold">{{ song.title }}</h2>
-          <p class="text-sm text-gray-600">{{ song.genre.join(', ') }}</p>
+<div *ngIf="isLoading$ | async; else loadedContent" role="alert" aria-live="assertive">
+  <ng-container [ngSwitch]="loaderType">
+    <div *ngSwitchCase="'skeleton'" class="mt-4" aria-label="Loading content, please wait...">
+      <app-skeleton-loader></app-skeleton-loader>
+    </div>
+    <div *ngSwitchCase="'spinner'" class="text-center mt-4" aria-label="Loading content, please wait...">
+      <app-spinner-loader></app-spinner-loader>
+    </div>
+    <div *ngSwitchCase="'progress'" class="mt-4" aria-label="Loading progress">
+      <app-progress-bar [progress]="progress" [duration]="2000"></app-progress-bar>
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #loadedContent>
+  <ul class="space-y-4" role="list">
+    <li
+      *ngFor="let song of songs$ | async; trackBy: trackById"
+      class="bg-white shadow-md rounded-lg overflow-hidden"
+      role="listitem"
+    >
+      <a [routerLink]="['/songs', song.id]" class="block p-4" [attr.aria-label]="'View details for ' + song.title">
+        <div class="flex items-center space-x-4">
+          <img
+            [src]="song.poster"
+            [alt]="getImageAltText(song)"
+            class="w-16 h-16 object-cover rounded"
+          />
+          <div>
+            <h2 class="text-xl font-semibold">{{ song.title }}</h2>
+            <p class="text-sm text-gray-600">{{ song.genre.join(', ') }}</p>
+          </div>
         </div>
-      </div>
-    </a>
-  </li>
-</ul>
+      </a>
+    </li>
+  </ul>
+</ng-template>
+
+<ng-template #metaTags>
+  <title>{{ pageTitle }}</title>
+  <meta name="description" content="{{ pageDescription }}">
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "MusicCollection",
+      "itemListElement": [
+        <ng-container *ngFor="let song of songs$ | async">
+          {
+            "@type": "MusicRecording",
+            "name": "{{ song.title }}",
+            "url": "/songs/{{ song.id }}",
+            "image": "{{ song.poster }}",
+            "genre": "{{ song.genre.join(', ') }}"
+          }<ng-container *ngIf="!isLastElement(song)">,</ng-container>
+        </ng-container>
+      ]
+    }
+  </script>
+</ng-template>

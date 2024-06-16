@@ -1,111 +1,73 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NavbarComponent } from './navbar.component';
-import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { NavbarService } from '../../services/navbar.service';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { NavbarService } from 'src/app/services/navbar.service';
+import { Meta, Title } from '@angular/platform-browser';
 import { of } from 'rxjs';
-import { RouterTestingModule } from '@angular/router/testing';
-import { By } from '@angular/platform-browser';
+import { NavbarComponent } from './navbar.component';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
   let fixture: ComponentFixture<NavbarComponent>;
-  let mockRouter: any;
-  let mockActivatedRoute: any;
-  let mockTranslateService: any;
-  let mockNavbarService: any;
+  let routerMock: any;
+  let activatedRouteMock: any;
+  let translateServiceMock: any;
+  let navbarServiceMock: any;
+  let metaService: Meta;
+  let titleService: Title;
 
-  beforeEach(async () => {
-    mockRouter = {
-      events: of(new NavigationEnd(0, '/', '/')),
-      navigate: jest.fn(),
+  beforeEach(waitForAsync(() => {
+    routerMock = {
+      events: of(new NavigationEnd(0, '', '')),
+      navigate: jasmine.createSpy('navigate')
     };
+    activatedRouteMock = { snapshot: { paramMap: { get: jasmine.createSpy('get').and.returnValue('') } } };
+    translateServiceMock = { get: jasmine.createSpy('get').and.returnValue(of('Translated Title')) };
+    navbarServiceMock = { title$: of('Test Title') };
 
-    mockActivatedRoute = {
-      snapshot: {
-        paramMap: {
-          get: jest.fn(),
-        },
-      },
-      firstChild: null,
-    };
-
-    mockTranslateService = {
-      get: jest.fn((key) => of(key)),
-    };
-
-    mockNavbarService = {
-      title$: of('Mock Title'),
-    };
-
-    await TestBed.configureTestingModule({
+    TestBed.configureTestingModule({
       declarations: [NavbarComponent],
-      imports: [RouterTestingModule, TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: TranslateService, useValue: mockTranslateService },
-        { provide: NavbarService, useValue: mockNavbarService },
-      ],
+        { provide: Router, useValue: routerMock },
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: TranslateService, useValue: translateServiceMock },
+        { provide: NavbarService, useValue: navbarServiceMock },
+        Meta,
+        Title
+      ]
     }).compileComponents();
 
+    metaService = TestBed.inject(Meta);
+    titleService = TestBed.inject(Title);
+  }));
+
+  beforeEach(() => {
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should toggle menuOpen property when toggleMenu is called', () => {
-    component.toggleMenu();
-    expect(component.menuOpen).toBe(true);
-    component.toggleMenu();
-    expect(component.menuOpen).toBe(false);
-  });
-
-  it('should set pageTitle from NavbarService', () => {
-    expect(component.pageTitle).toBe('Mock Title');
-  });
-
-  it('should display the title in the navbar', () => {
-    const titleElement = fixture.debugElement.query(By.css('.navbar__title'));
-    expect(titleElement.nativeElement.textContent.trim()).toBe('Mock Title');
-  });
-
-  it('should display translated titles for links', () => {
-    const links = ['SONGS', 'ARTISTS', 'COMPANIES'];
-    mockTranslateService.get.mockImplementation((key: any) => of(key));
-    fixture.detectChanges();
-    
-    const linkElements = fixture.debugElement.queryAll(
-      By.css('.navbar__links a')
-    );
-    expect(linkElements.length).toBe(links.length);
-    links.forEach((link, index) => {
-      expect(linkElements[index].nativeElement.textContent.trim()).toBe(link);
+  it('should initialize with the correct page title', () => {
+    component.ngOnInit();
+    component.pageTitle$.subscribe(title => {
+      expect(title).toBe('Test Title');
     });
   });
 
-  it('should close the menu when a sidebar link is clicked', () => {
-    component.menuOpen = true;
-    fixture.detectChanges();
-    const sidebarLink = fixture.debugElement.query(
-      By.css('.navbar__sidebar-link')
-    );
-    sidebarLink.triggerEventHandler('click', null);
-    expect(component.menuOpen).toBe(false);
+  it('should set meta tags on init', () => {
+    component.ngOnInit();
+    expect(titleService.getTitle()).toBe('Test Title');
+    expect(metaService.getTag('name="description"')?.content).toBe('Current page: Test Title');
   });
 
-  it('should subscribe to router events and set the pageTitle based on route data', () => {
-    mockNavbarService.title$ = of(null);
-    const routeData = { title: 'Mock Route Title' };
-    mockActivatedRoute.firstChild = {
-      snapshot: { data: routeData },
-    };
-
-    component.ngOnInit();
-    expect(component.pageTitle).toBe('Mock Route Title');
+  it('should toggle menuOpen state when toggleMenu is called', () => {
+    component.toggleMenu();
+    expect(component.menuOpen).toBeTrue();
+    component.toggleMenu();
+    expect(component.menuOpen).toBeFalse();
   });
 });

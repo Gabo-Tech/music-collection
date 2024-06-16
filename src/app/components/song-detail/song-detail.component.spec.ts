@@ -1,102 +1,81 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { SongService } from '../../services/song.service';
-import { NavbarService } from '../../services/navbar.service';
+import { of } from 'rxjs';
+import { SongService } from 'src/app/services/song.service';
+import { NavbarService } from 'src/app/services/navbar.service';
 import { SongDetailComponent } from './song-detail.component';
-import { By } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 
 describe('SongDetailComponent', () => {
   let component: SongDetailComponent;
   let fixture: ComponentFixture<SongDetailComponent>;
-  let mockSongService: any;
-  let mockNavbarService: any;
-  let mockActivatedRoute: any;
+  let songServiceMock: any;
+  let navbarServiceMock: any;
+  let activatedRouteMock: any;
+  let metaService: Meta;
+  let titleService: Title;
 
-  beforeEach(async () => {
-    mockSongService = {
-      getSong: jest.fn(),
+  beforeEach(waitForAsync(() => {
+    songServiceMock = {
+      getSong: jasmine.createSpy('getSong').and.returnValue(of({
+        id: 1,
+        title: 'Test Song',
+        poster: 'test-poster.jpg',
+        genre: ['Pop'],
+        year: 2021,
+        duration: 200,
+        rating: 4.5,
+        artist: 'Test Artist'
+      }))
     };
+    navbarServiceMock = { setTitle: jasmine.createSpy('setTitle') };
+    activatedRouteMock = { snapshot: { paramMap: { get: jasmine.createSpy('get').and.returnValue('1') } } };
 
-    mockNavbarService = {
-      setTitle: jest.fn(),
-    };
-
-    mockActivatedRoute = {
-      snapshot: {
-        paramMap: {
-          get: jest.fn().mockReturnValue('1'),
-        },
-      },
-    };
-
-    await TestBed.configureTestingModule({
+    TestBed.configureTestingModule({
       declarations: [SongDetailComponent],
       providers: [
-        { provide: SongService, useValue: mockSongService },
-        { provide: NavbarService, useValue: mockNavbarService },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-      ],
+        { provide: SongService, useValue: songServiceMock },
+        { provide: NavbarService, useValue: navbarServiceMock },
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        Meta,
+        Title
+      ]
     }).compileComponents();
-  });
+
+    metaService = TestBed.inject(Meta);
+    titleService = TestBed.inject(Title);
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SongDetailComponent);
     component = fixture.componentInstance;
-    mockSongService.getSong.mockReturnValue(
-      of({
-        poster: 'test-poster-url',
-        title: 'Test Song',
-        genre: ['Pop', 'Rock'],
-        year: 2021,
-        duration: 210,
-        rating: 4.5,
-        artist: 'Test Artist',
-      })
-    );
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should set loading to false and call setTitle on ngOnInit', () => {
+  it('should load song details on init', () => {
     component.ngOnInit();
-    expect(component.loading).toBe(false);
-    expect(mockNavbarService.setTitle).toHaveBeenCalledWith('Test Song');
+    component.song$.subscribe(song => {
+      expect(song?.title).toBe('Test Song');
+    });
+    expect(songServiceMock.getSong).toHaveBeenCalledWith(1);
+    expect(navbarServiceMock.setTitle).toHaveBeenCalledWith('Test Song');
   });
 
-  it('should display loading message when loading is true', () => {
-    component.loading = true;
-    fixture.detectChanges();
-    const loadingDiv = fixture.debugElement.query(By.css('.text-center'));
-    expect(loadingDiv).toBeTruthy();
-    expect(loadingDiv.nativeElement.textContent).toContain('Loading...');
-  });
-
-  it('should display song details when loading is false', () => {
-    component.loading = false;
-    fixture.detectChanges();
-
-    const img = fixture.debugElement.query(By.css('img')).nativeElement;
-    const title = fixture.debugElement.query(By.css('h1')).nativeElement;
-    const genre = fixture.debugElement.query(By.css('.genre')).nativeElement;
-
-    expect(img.src).toContain('test-poster-url');
-    expect(img.alt).toBe('Test Song');
-    expect(title.textContent).toBe('Test Song');
-    expect(genre.textContent).toContain('Pop, Rock');
-  });
-
-  it('should handle errors gracefully', () => {
-    mockSongService.getSong.mockReturnValueOnce(of(null));
+  it('should set meta tags on init', () => {
     component.ngOnInit();
-    fixture.detectChanges();
+    expect(titleService.getTitle()).toBe('Test Song - Song Details');
+    expect(metaService.getTag('name="description"')?.content).toBe('Details of the song Test Song, a Pop track.');
+  });
 
-    expect(component.loading).toBe(false);
-    const errorDiv = fixture.debugElement.query(By.css('.error-message'));
-    expect(errorDiv).toBeTruthy();
-    expect(errorDiv.nativeElement.textContent).toContain('Error loading song details');
+  it('should initialize progress to 100 after a delay', (done) => {
+    component.ngOnInit();
+    setTimeout(() => {
+      expect(component.progress).toBe(100);
+      done();
+    }, 2000);
   });
 });

@@ -1,14 +1,15 @@
-<div *ngIf="loading$ | async" class="text-center mt-4">Loading...</div>
-<ul *ngIf="!(loading$ | async)" class="space-y-4">
+<div *ngIf="loading$ | async" class="text-center mt-4" role="alert" aria-live="assertive">Loading...</div>
+<ul *ngIf="!(loading$ | async)" class="space-y-4" role="list">
   <li
-    *ngFor="let artist of artists"
+    *ngFor="let artist of artists$ | async; trackBy: trackById"
     class="bg-white shadow-md rounded-lg overflow-hidden"
+    role="listitem"
   >
-    <a [routerLink]="['/artists', artist.id]" class="block p-4">
+    <a [routerLink]="['/artists', artist.id]" class="block p-4" [attr.aria-label]="'View details for ' + artist.name">
       <div class="flex items-center space-x-4">
         <img
           [src]="artist.img"
-          alt="{{ artist.name }}"
+          [alt]="artist.name"
           class="w-16 h-16 object-cover rounded"
         />
         <div>

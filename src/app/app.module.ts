@@ -18,6 +18,9 @@ import { environment } from './environments/environment';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { NavbarService } from './services/navbar.service';
 import { ArtistsListComponent } from './components/artists-list/artists-list.component';
+import { SkeletonComponent } from './components/loaders/skeleton/skeleton.component';
+import { SpinnerComponent } from './components/loaders/spinner/spinner.component';
+import { ProgressBarComponent } from './components/loaders/progress-bar/progress-bar.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http);
@@ -31,6 +34,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     SongFormComponent,
     NavbarComponent,
     ArtistsListComponent,
+    SkeletonComponent,
+    SpinnerComponent,
+    ProgressBarComponent
   ],
   imports: [
     BrowserModule,

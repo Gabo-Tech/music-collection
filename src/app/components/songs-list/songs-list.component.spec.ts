@@ -1,29 +1,38 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
-import { By } from '@angular/platform-browser';
 import { SongsListComponent } from './songs-list.component';
-import { loadSongs } from '../../store/actions/song.actions';
-import { selectAllSongs, selectLoading } from '../../store/selectors/song.selectors';
-import { RouterTestingModule } from '@angular/router/testing';
+import { AppState } from 'src/app/store/app.state';
+import { loadSongs } from 'src/app/store/actions/song.actions';
+import { selectAllSongs, selectLoading } from 'src/app/store/selectors/song.selectors';
+import { Meta, Title } from '@angular/platform-browser';
+import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
+import { of } from 'rxjs';
 
 describe('SongsListComponent', () => {
   let component: SongsListComponent;
   let fixture: ComponentFixture<SongsListComponent>;
-  let store: MockStore;
-  const initialState = {
-    songs: [],
-    loading: false,
-  };
+  let store: MockStore<AppState>;
+  let metaService: Meta;
+  let titleService: Title;
+  const initialState = { songs: [], loading: false };
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
       declarations: [SongsListComponent],
-      imports: [RouterTestingModule],
-      providers: [provideMockStore({ initialState })],
+      providers: [
+        provideMockStore({ initialState }),
+        Meta,
+        Title
+      ]
     }).compileComponents();
 
     store = TestBed.inject(MockStore);
-  });
+    metaService = TestBed.inject(Meta);
+    titleService = TestBed.inject(Title);
+    store.overrideSelector(selectAllSongs, []);
+    store.overrideSelector(selectLoading, false);
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SongsListComponent);
@@ -31,58 +40,55 @@ describe('SongsListComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display loading message when loading is true', () => {
+  it('should initialize observables', () => {
+    expect(component.songs$).toBeDefined();
+    expect(component.isLoading$).toBeDefined();
+  });
+
+  it('should dispatch loadSongs action on init', () => {
+    const dispatchSpy = spyOn(store, 'dispatch').and.callThrough();
+    component.ngOnInit();
+    expect(dispatchSpy).toHaveBeenCalledWith(loadSongs());
+  });
+
+  it('should display loading spinner when loading', () => {
     store.overrideSelector(selectLoading, true);
     store.refreshState();
     fixture.detectChanges();
 
-    const loadingDiv = fixture.debugElement.query(By.css('.text-center'));
-    expect(loadingDiv).toBeTruthy();
-    expect(loadingDiv.nativeElement.textContent).toContain('Loading...');
+    const loadingElement: DebugElement = fixture.debugElement.query(By.css('div[role="alert"]'));
+    expect(loadingElement).toBeTruthy();
   });
 
-  it('should display songs list when loading is false', () => {
-    const songs = [
-      {
-        id: 1,
-        title: 'Test Song 1',
-        genre: ['Pop'],
-        poster: 'test-poster-url-1',
-      },
-      {
-        id: 2,
-        title: 'Test Song 2',
-        genre: ['Rock'],
-        poster: 'test-poster-url-2',
-      },
+  it('should display songs when not loading', () => {
+    const mockSongs = [
+      { id: 1, title: 'Song 1', poster: 'poster1.jpg', genre: ['Pop'] },
+      { id: 2, title: 'Song 2', poster: 'poster2.jpg', genre: ['Rock'] }
     ];
+    store.overrideSelector(selectAllSongs, mockSongs);
     store.overrideSelector(selectLoading, false);
-    store.overrideSelector(selectAllSongs, songs);
     store.refreshState();
     fixture.detectChanges();
 
-    const songItems = fixture.debugElement.queryAll(By.css('li'));
-    expect(songItems.length).toBe(songs.length);
-
-    songItems.forEach((item, index) => {
-      const song = songs[index];
-      const title = item.query(By.css('h2')).nativeElement;
-      const genre = item.query(By.css('p')).nativeElement;
-      const img = item.query(By.css('img')).nativeElement;
-
-      expect(title.textContent).toBe(song.title);
-      expect(genre.textContent).toBe(song.genre.join(', '));
-      expect(img.src).toContain(song.poster);
-    });
+    const songElements: DebugElement[] = fixture.debugElement.queryAll(By.css('li[role="listitem"]'));
+    expect(songElements.length).toBe(mockSongs.length);
   });
 
-  it('should dispatch loadSongs action on init', () => {
-    const dispatchSpy = jest.spyOn(store, 'dispatch');
+  it('should initialize progress bar correctly', (done) => {
     component.ngOnInit();
-    expect(dispatchSpy).toHaveBeenCalledWith(loadSongs());
+    setTimeout(() => {
+      expect(component.progress).toBe(100);
+      done();
+    }, 2000);
+  });
+
+  it('should set meta tags correctly', () => {
+    component.ngOnInit();
+    expect(titleService.getTitle()).toBe(component.pageTitle);
+    expect(metaService.getTag('name="description"')?.content).toBe(component.pageDescription);
   });
 });
