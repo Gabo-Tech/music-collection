@@ -21,6 +21,8 @@ import { ArtistsListComponent } from './components/artists-list/artists-list.com
 import { SkeletonComponent } from './components/loaders/skeleton/skeleton.component';
 import { SpinnerComponent } from './components/loaders/spinner/spinner.component';
 import { ProgressBarComponent } from './components/loaders/progress-bar/progress-bar.component';
+import { artistReducer } from './store/reducers/artist.reducer';
+import { ArtistEffects } from './store/effects/artist.effects';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http);
@@ -51,8 +53,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
         deps: [HttpClient],
       },
     }),
-    StoreModule.forRoot({ songs: songReducer }),
-    EffectsModule.forRoot([SongEffects]),
+    StoreModule.forRoot({ songs: songReducer, artists: artistReducer }),
+    EffectsModule.forRoot([SongEffects, ArtistEffects]),
     StoreDevtoolsModule.instrument({
       maxAge: 25,
       logOnly: environment.production,
