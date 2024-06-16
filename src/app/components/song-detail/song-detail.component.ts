@@ -3,8 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { SongService } from 'src/app/services/song.service';
 import { NavbarService } from 'src/app/services/navbar.service';
 import { Meta, Title } from '@angular/platform-browser';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { Song } from '../../../models/song.model';
 
 @Component({
@@ -15,7 +15,7 @@ import { Song } from '../../../models/song.model';
 })
 export class SongDetailComponent implements OnInit {
   song$: Observable<Song | null> = of(null); // Use the Song type
-  loading$: Observable<boolean> = of(true);
+  loading$ = new BehaviorSubject<boolean>(true); // BehaviorSubject to manage loading state
   loaderType: string = '';
   progress: number = 0;
 
@@ -29,22 +29,30 @@ export class SongDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectRandomLoader();
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.song$ = this.songService.getSong(+id).pipe(
-        map((data: Song) => {
-          this.navbarService.setTitle(data.title);
-          this.setMetaTags(data.title, data.genre.join(', '));
-          this.loading$ = of(false);
-          return data;
-        }),
-        catchError(() => {
-          this.loading$ = of(false);
+    this.initializeProgress();
+
+    this.route.paramMap.pipe(
+      switchMap(params => {
+        const id = params.get('id');
+        if (id) {
+          return this.songService.getSong(+id).pipe(
+            map((data: Song) => {
+              this.navbarService.setTitle(data.title);
+              this.setMetaTags(data.title, data.genre.join(', '));
+              this.loading$.next(false);
+              return data;
+            }),
+            catchError(() => {
+              this.loading$.next(false);
+              return of(null);
+            })
+          );
+        } else {
+          this.loading$.next(false);
           return of(null);
-        })
-      );
-      this.initializeProgress();
-    }
+        }
+      })
+    ).subscribe(song => this.song$ = of(song));
   }
 
   private selectRandomLoader(): void {
