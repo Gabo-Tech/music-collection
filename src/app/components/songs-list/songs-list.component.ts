@@ -3,10 +3,7 @@ import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { AppState } from 'src/app/store/app.state';
 import { loadSongs } from 'src/app/store/actions/song.actions';
-import {
-  selectAllSongs,
-  selectLoading,
-} from 'src/app/store/selectors/song.selectors';
+import { selectAllSongs, selectLoading } from 'src/app/store/selectors/song.selectors';
 import { Meta, Title } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -92,6 +89,15 @@ export class SongsListComponent implements OnInit {
   }
 
   /**
+   * Helper method to check if a value is an array.
+   * @param value The value to check.
+   * @returns True if the value is an array, otherwise false.
+   */
+  isArray(value: any): boolean {
+    return Array.isArray(value);
+  }
+
+  /**
    * Sets meta tags for the component.
    */
   private setMetaTags(): void {
@@ -128,7 +134,7 @@ export class SongsListComponent implements OnInit {
           "name": "${song.title}",
           "url": "/songs/${song.id}",
           "image": "${song.poster}",
-          "genre": "${song.genre.join(', ')}"
+          "genre": "${Array.isArray(song.genre) ? song.genre.join(', ') : song.genre}"
         }${index < songs.length - 1 ? ',' : ''}
       `).join('');
     });
