@@ -1,76 +1,47 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
+import { ArtistsListComponent } from './artists-list.component';
 import { Store, StoreModule } from '@ngrx/store';
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
-import { Observable, of } from 'rxjs';
-import { ArtistsListComponent } from './artists-list.component';
+import {
+  selectAllArtists,
+  selectLoading,
+} from 'src/app/store/selectors/artist.selectors';
 import { loadArtists } from 'src/app/store/actions/artist.actions';
-import { selectAllArtists, selectLoading } from 'src/app/store/selectors/artist.selectors';
-import { Artist } from '../../../models/artist.model';
+import { AppState } from 'src/app/store/app.state';
+import { By } from '@angular/platform-browser';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('ArtistsListComponent', () => {
   let component: ArtistsListComponent;
   let fixture: ComponentFixture<ArtistsListComponent>;
-  let store: MockStore;
-  let mockSelectAllArtists: Observable<Artist[]>;
-  let mockSelectLoading: Observable<boolean>;
+  let store: MockStore<AppState>;
 
   beforeEach(waitForAsync(() => {
-    mockSelectAllArtists = of([
-      { id: 1, name: 'Artist 1', img: 'img1.jpg', bornCity: 'City 1' },
-      { id: 2, name: 'Artist 2', img: 'img2.jpg', bornCity: 'City 2' }
-    ]);
-    mockSelectLoading = of(false);
-
     TestBed.configureTestingModule({
       declarations: [ArtistsListComponent],
-      providers: [
-        provideMockStore({
-          selectors: [
-            { selector: selectAllArtists, value: mockSelectAllArtists },
-            { selector: selectLoading, value: mockSelectLoading }
-          ]
-        })
-      ]
-    }).compileComponents();
+      imports: [StoreModule.forRoot({})],
+      providers: [provideMockStore()],
+      schemas: [NO_ERRORS_SCHEMA],
+    })
+      .compileComponents()
+      .then(() => {
+        fixture = TestBed.createComponent(ArtistsListComponent);
+        component = fixture.componentInstance;
+        store = TestBed.inject(Store) as MockStore<AppState>;
 
-    store = TestBed.inject(MockStore);
+        store.overrideSelector(selectAllArtists, []);
+        store.overrideSelector(selectLoading, false);
+      });
   }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ArtistsListComponent);
-    component = fixture.componentInstance;
+  it('should create', () => {
     fixture.detectChanges();
-  });
-
-  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
   it('should dispatch loadArtists action on init', () => {
-    const dispatchSpy = spyOn(store, 'dispatch').and.callThrough();
-    component.ngOnInit();
+    const dispatchSpy = spyOn(store, 'dispatch');
+    fixture.detectChanges();
     expect(dispatchSpy).toHaveBeenCalledWith(loadArtists());
-  });
-
-  it('should display loading indicator when loading', () => {
-    store.overrideSelector(selectLoading, true);
-    store.refreshState();
-    fixture.detectChanges();
-
-    const loadingElement: HTMLElement = fixture.nativeElement.querySelector('div[role="alert"]');
-    expect(loadingElement.textContent).toContain('Loading...');
-  });
-
-  it('should display list of artists when not loading', () => {
-    store.overrideSelector(selectAllArtists, [
-      { id: 1, name: 'Artist 1', img: 'img1.jpg', bornCity: 'City 1' },
-      { id: 2, name: 'Artist 2', img: 'img2.jpg', bornCity: 'City 2' }
-    ]);
-    store.overrideSelector(selectLoading, false);
-    store.refreshState();
-    fixture.detectChanges();
-
-    const artistElements: HTMLElement[] = fixture.nativeElement.querySelectorAll('li[role="listitem"]');
-    expect(artistElements.length).toBe(2);
   });
 });

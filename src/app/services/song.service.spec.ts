@@ -16,7 +16,6 @@ describe('SongService', () => {
       imports: [HttpClientTestingModule],
       providers: [SongService],
     });
-
     service = TestBed.inject(SongService);
     httpMock = TestBed.inject(HttpTestingController);
   });
@@ -31,13 +30,14 @@ describe('SongService', () => {
 
   it('should fetch songs with posters', () => {
     const mockSongs = [
-      { id: 1, title: 'Song 1', genre: 'Pop' },
-      { id: 2, title: 'Song 2', genre: 'Rock' },
+      { id: 1, title: 'Test Song 1' },
+      { id: 2, title: 'Test Song 2' },
     ];
 
     service.getSongs().subscribe((songs) => {
       expect(songs.length).toBe(2);
       expect(songs[0].poster).toContain(imageApiUrl);
+      expect(songs[1].poster).toContain(imageApiUrl);
     });
 
     const req = httpMock.expectOne(apiUrl);
@@ -46,7 +46,7 @@ describe('SongService', () => {
   });
 
   it('should fetch a single song', () => {
-    const mockSong = { id: 1, title: 'Song 1', genre: 'Pop' };
+    const mockSong = { id: 1, title: 'Test Song 1' };
 
     service.getSong(1).subscribe((song) => {
       expect(song).toEqual(mockSong);
@@ -57,23 +57,24 @@ describe('SongService', () => {
     req.flush(mockSong);
   });
 
-  it('should add a new song', () => {
-    const newSong = { title: 'New Song', genre: 'Jazz' };
+  it('should add a song', () => {
+    const newSong = { title: 'New Song' };
+    const mockResponse = { id: 3, title: 'New Song' };
 
     service.addSong(newSong).subscribe((song) => {
-      expect(song).toEqual(newSong);
+      expect(song).toEqual(mockResponse);
     });
 
     const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('POST');
-    req.flush(newSong);
+    req.flush(mockResponse);
   });
 
   it('should update a song', () => {
-    const updatedSong = { id: 1, title: 'Updated Song', genre: 'Jazz' };
+    const updatedSong = { id: 1, title: 'Updated Song' };
 
-    service.updateSong(1, updatedSong).subscribe((response) => {
-      expect(response).toEqual(updatedSong);
+    service.updateSong(1, updatedSong).subscribe((song) => {
+      expect(song).toEqual(updatedSong);
     });
 
     const req = httpMock.expectOne(`${apiUrl}/1`);
@@ -83,7 +84,7 @@ describe('SongService', () => {
 
   it('should delete a song', () => {
     service.deleteSong(1).subscribe((response) => {
-      expect(response).toBeTruthy();
+      expect(response).toEqual({});
     });
 
     const req = httpMock.expectOne(`${apiUrl}/1`);

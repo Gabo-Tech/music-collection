@@ -7,7 +7,7 @@ import { SongService } from 'src/app/services/song.service';
   selector: 'app-song-form',
   templateUrl: './song-form.component.html',
   styleUrls: ['./song-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SongFormComponent implements OnInit {
   songForm: FormGroup;
@@ -27,7 +27,14 @@ export class SongFormComponent implements OnInit {
     this.songForm = this.fb.group({
       title: ['', Validators.required],
       genre: ['', Validators.required],
-      year: ['', [Validators.required, Validators.min(1900), Validators.max(this.currentYear)]],
+      year: [
+        '',
+        [
+          Validators.required,
+          Validators.min(1900),
+          Validators.max(this.currentYear),
+        ],
+      ],
       duration: ['', Validators.required],
       rating: ['', [Validators.required, Validators.min(0), Validators.max(5)]],
       artist: ['', Validators.required],

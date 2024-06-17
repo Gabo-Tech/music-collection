@@ -38,7 +38,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     ArtistsListComponent,
     SkeletonComponent,
     SpinnerComponent,
-    ProgressBarComponent
+    ProgressBarComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,13 +1,28 @@
-<div *ngIf="isLoading$ | async; else loadedContent" role="alert" aria-live="assertive">
+<div
+  *ngIf="isLoading$ | async; else loadedContent"
+  role="alert"
+  aria-live="assertive"
+>
   <ng-container [ngSwitch]="loaderType">
-    <div *ngSwitchCase="'skeleton'" class="mt-4" aria-label="Loading content, please wait...">
+    <div
+      *ngSwitchCase="'skeleton'"
+      class="mt-4"
+      aria-label="Loading content, please wait..."
+    >
       <app-skeleton-loader></app-skeleton-loader>
     </div>
-    <div *ngSwitchCase="'spinner'" class="text-center mt-4" aria-label="Loading content, please wait...">
+    <div
+      *ngSwitchCase="'spinner'"
+      class="text-center mt-4"
+      aria-label="Loading content, please wait..."
+    >
       <app-spinner-loader></app-spinner-loader>
     </div>
     <div *ngSwitchCase="'progress'" class="mt-4" aria-label="Loading progress">
-      <app-progress-bar [progress]="progress" [duration]="2000"></app-progress-bar>
+      <app-progress-bar
+        [progress]="progress"
+        [duration]="2000"
+      ></app-progress-bar>
     </div>
   </ng-container>
 </div>
@@ -19,7 +34,11 @@
       class="bg-white shadow-md rounded-lg overflow-hidden"
       role="listitem"
     >
-      <a [routerLink]="['/songs', song.id]" class="block p-4" [attr.aria-label]="'View details for ' + song.title">
+      <a
+        [routerLink]="['/songs', song.id]"
+        class="block p-4"
+        [attr.aria-label]="'View details for ' + song.title"
+      >
         <div class="flex items-center space-x-4">
           <img
             [src]="song.poster"
@@ -28,7 +47,9 @@
           />
           <div>
             <h2 class="text-xl font-semibold">{{ song.title }}</h2>
-            <p class="text-sm text-gray-600">{{ isArray(song.genre) ? song.genre.join(', ') : song.genre }}</p>
+            <p class="text-sm text-gray-600">
+              {{ isArray(song.genre) ? song.genre.join(', ') : song.genre }}
+            </p>
           </div>
         </div>
       </a>
@@ -38,7 +59,7 @@
 
 <ng-template #metaTags>
   <title>{{ pageTitle }}</title>
-  <meta name="description" content="{{ pageDescription }}">
+  <meta name="description" content="{{ pageDescription }}" />
   <script type="application/ld+json">
     {
       "@context": "http://schema.org",

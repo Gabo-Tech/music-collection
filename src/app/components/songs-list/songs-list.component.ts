@@ -1,9 +1,18 @@
-import { Component, OnInit, ChangeDetectionStrategy, Inject, PLATFORM_ID } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  Inject,
+  PLATFORM_ID,
+} from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, BehaviorSubject, combineLatest, of } from 'rxjs';
 import { AppState } from 'src/app/store/app.state';
 import { loadSongs } from 'src/app/store/actions/song.actions';
-import { selectAllSongs, selectLoading } from 'src/app/store/selectors/song.selectors';
+import {
+  selectAllSongs,
+  selectLoading,
+} from 'src/app/store/selectors/song.selectors';
 import { Meta, Title } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
 import { map, take } from 'rxjs/operators';
@@ -12,7 +21,7 @@ import { map, take } from 'rxjs/operators';
   selector: 'app-song-list',
   templateUrl: './songs-list.component.html',
   styleUrls: ['./songs-list.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SongsListComponent implements OnInit {
   songs$: Observable<any[]> = this.store.pipe(select(selectAllSongs));
@@ -20,7 +29,8 @@ export class SongsListComponent implements OnInit {
   loaderType: string = '';
   progress: number = 0;
   pageTitle: string = 'Music Collection - Browse Songs';
-  pageDescription: string = 'Discover a wide range of music tracks across various genres in our music collection.';
+  pageDescription: string =
+    'Discover a wide range of music tracks across various genres in our music collection.';
   private imagesLoaded$ = new BehaviorSubject<boolean>(false);
   allImagesLoaded$: Observable<boolean>;
 
@@ -30,9 +40,10 @@ export class SongsListComponent implements OnInit {
     private titleService: Title,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    this.allImagesLoaded$ = combineLatest([this.isLoading$, this.imagesLoaded$]).pipe(
-      map(([loading, imagesLoaded]) => !loading && imagesLoaded)
-    );
+    this.allImagesLoaded$ = combineLatest([
+      this.isLoading$,
+      this.imagesLoaded$,
+    ]).pipe(map(([loading, imagesLoaded]) => !loading && imagesLoaded));
   }
 
   ngOnInit(): void {
@@ -54,7 +65,8 @@ export class SongsListComponent implements OnInit {
    */
   private selectRandomLoader(): void {
     const loaderOptions = ['skeleton', 'spinner', 'progress'];
-    this.loaderType = loaderOptions[Math.floor(Math.random() * loaderOptions.length)];
+    this.loaderType =
+      loaderOptions[Math.floor(Math.random() * loaderOptions.length)];
   }
 
   /**
@@ -109,7 +121,10 @@ export class SongsListComponent implements OnInit {
    */
   private setMetaTags(): void {
     this.titleService.setTitle(this.pageTitle);
-    this.metaService.updateTag({ name: 'description', content: this.pageDescription });
+    this.metaService.updateTag({
+      name: 'description',
+      content: this.pageDescription,
+    });
 
     if (isPlatformBrowser(this.platformId)) {
       const script = document.createElement('script');
@@ -134,8 +149,10 @@ export class SongsListComponent implements OnInit {
   private getStructuredData(): string {
     let structuredData = '';
 
-    this.songs$.pipe(take(1)).subscribe(songs => {
-      structuredData = songs.map((song, index) => `
+    this.songs$.pipe(take(1)).subscribe((songs) => {
+      structuredData = songs
+        .map(
+          (song, index) => `
         {
           "@type": "MusicRecording",
           "name": "${song.title}",
@@ -143,7 +160,9 @@ export class SongsListComponent implements OnInit {
           "image": "${song.poster}",
           "genre": "${Array.isArray(song.genre) ? song.genre.join(', ') : song.genre}"
         }${index < songs.length - 1 ? ',' : ''}
-      `).join('');
+      `
+        )
+        .join('');
     });
 
     return structuredData;
@@ -153,11 +172,11 @@ export class SongsListComponent implements OnInit {
    * Checks if all images are loaded.
    */
   public checkImagesLoaded(): void {
-    this.songs$.pipe(take(1)).subscribe(songs => {
+    this.songs$.pipe(take(1)).subscribe((songs) => {
       const totalImages = songs.length;
       let loadedImages = 0;
 
-      songs.forEach(song => {
+      songs.forEach((song) => {
         const img = new Image();
         img.src = song.poster;
         img.onload = () => {

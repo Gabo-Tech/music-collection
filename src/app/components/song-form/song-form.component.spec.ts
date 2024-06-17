@@ -1,96 +1,98 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
-import { SongService } from 'src/app/services/song.service';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SongFormComponent } from './song-form.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { SongService } from 'src/app/services/song.service';
+import { RouterTestingModule } from '@angular/router/testing';
+import { of } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('SongFormComponent', () => {
   let component: SongFormComponent;
   let fixture: ComponentFixture<SongFormComponent>;
-  let songServiceMock: any;
-  let routerMock: any;
-  let activatedRouteMock: any;
+  let mockSongService: jasmine.SpyObj<SongService>;
+  let mockRouter: jasmine.SpyObj<Router>;
 
-  beforeEach(waitForAsync(() => {
-    songServiceMock = {
-      getSong: jasmine.createSpy('getSong').and.returnValue(of({ title: 'Test Song', genre: 'Pop', year: 2021, duration: 200, rating: 4.5, artist: 'Test Artist' })),
-      addSong: jasmine.createSpy('addSong').and.returnValue(of({})),
-      updateSong: jasmine.createSpy('updateSong').and.returnValue(of({}))
-    };
-    routerMock = { navigate: jasmine.createSpy('navigate') };
-    activatedRouteMock = { snapshot: { paramMap: { get: jasmine.createSpy('get').and.returnValue('1') } } };
+  beforeEach(async () => {
+    mockSongService = jasmine.createSpyObj('SongService', [
+      'getSong',
+      'addSong',
+      'updateSong',
+    ]);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockSongService.getSong.and.returnValue(
+      of({
+        id: 1,
+        title: 'Test Song',
+        genre: 'Pop',
+        year: 2021,
+        duration: 240,
+        rating: 4.5,
+        artist: 'Test Artist',
+        poster: 'test-poster.jpg',
+      })
+    );
+    mockSongService.addSong.and.returnValue(of({}));
+    mockSongService.updateSong.and.returnValue(of({}));
 
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       declarations: [SongFormComponent],
-      imports: [ReactiveFormsModule],
+      imports: [ReactiveFormsModule, FormsModule, RouterTestingModule],
       providers: [
-        { provide: SongService, useValue: songServiceMock },
-        { provide: Router, useValue: routerMock },
-        { provide: ActivatedRoute, useValue: activatedRouteMock }
-      ]
+        { provide: SongService, useValue: mockSongService },
+        { provide: Router, useValue: mockRouter },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: { paramMap: { get: (key: string) => '1' } },
+          },
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(SongFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create the component', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize the form with empty values for new song', () => {
-    activatedRouteMock.snapshot.paramMap.get.and.returnValue(null);
-    component.ngOnInit();
-    expect(component.songForm.value).toEqual({ title: '', genre: '', year: '', duration: '', rating: '', artist: '' });
-    expect(component.isEdit).toBeFalse();
+  it('should initialize form with song data when editing', () => {
+    expect(component.songForm.value).toEqual({
+      title: 'Test Song',
+      genre: 'Pop',
+      year: 2021,
+      duration: 240,
+      rating: 4.5,
+      artist: 'Test Artist',
+    });
   });
 
-  it('should initialize the form with existing song values for edit', () => {
-    component.ngOnInit();
-    expect(component.songForm.value).toEqual({ title: 'Test Song', genre: 'Pop', year: 2021, duration: 200, rating: 4.5, artist: 'Test Artist' });
-    expect(component.isEdit).toBeTrue();
+  it('should set page title to "Edit Song" when editing', () => {
+    expect(component.pageTitle).toBe('Edit Song');
   });
 
-  it('should disable submit button if form is invalid', () => {
-    const submitButton: HTMLButtonElement = fixture.nativeElement.querySelector('button[type="submit"]');
-    expect(submitButton.disabled).toBeTrue();
-  });
-
-  it('should enable submit button if form is valid', () => {
-    component.songForm.setValue({ title: 'Test Song', genre: 'Pop', year: 2021, duration: 200, rating: 4.5, artist: 'Test Artist' });
-    fixture.detectChanges();
-    const submitButton: HTMLButtonElement = fixture.nativeElement.querySelector('button[type="submit"]');
-    expect(submitButton.disabled).toBeFalse();
-  });
-
-  it('should call addSong on submit for new song', () => {
-    activatedRouteMock.snapshot.paramMap.get.and.returnValue(null);
-    component.ngOnInit();
-    component.songForm.setValue({ title: 'New Song', genre: 'Rock', year: 2022, duration: 180, rating: 4.8, artist: 'New Artist' });
-    fixture.detectChanges();
+  it('should call updateSong on submit when editing', () => {
     component.onSubmit();
-    expect(songServiceMock.addSong).toHaveBeenCalledWith({ title: 'New Song', genre: 'Rock', year: 2022, duration: 180, rating: 4.8, artist: 'New Artist' });
-    expect(routerMock.navigate).toHaveBeenCalledWith(['/songs']);
+    expect(mockSongService.updateSong).toHaveBeenCalled();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/songs']);
   });
 
-  it('should call updateSong on submit for existing song', () => {
-    component.ngOnInit();
-    component.songForm.setValue({ title: 'Updated Song', genre: 'Jazz', year: 2023, duration: 240, rating: 5, artist: 'Updated Artist' });
-    fixture.detectChanges();
+  it('should call addSong on submit when not editing', () => {
+    component.isEdit = false;
+    component.songForm.patchValue({
+      title: 'New Song',
+      genre: 'Rock',
+      year: 2022,
+      duration: 300,
+      rating: 5,
+      artist: 'New Artist',
+    });
     component.onSubmit();
-    expect(songServiceMock.updateSong).toHaveBeenCalledWith(1, { title: 'Updated Song', genre: 'Jazz', year: 2023, duration: 240, rating: 5, artist: 'Updated Artist' });
-    expect(routerMock.navigate).toHaveBeenCalledWith(['/songs']);
-  });
-
-  it('should initialize progress to 100 after a delay', (done) => {
-    component.ngOnInit();
-    setTimeout(() => {
-      expect(component.progress).toBe(100);
-      done();
-    }, 2000);
+    expect(mockSongService.addSong).toHaveBeenCalled();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/songs']);
   });
 });

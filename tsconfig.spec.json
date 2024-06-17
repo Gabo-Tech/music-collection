@@ -2,10 +2,14 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
-    "types": ["jest", "node"],
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "types": ["jasmine", "node"]
   },
-  "files": ["src/test.ts", "setup-jest.ts"],
-  "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
+  "files": [
+    "src/test.ts",
+    "src/polyfills.ts"
+  ],
+  "include": [
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts"
+  ]
 }

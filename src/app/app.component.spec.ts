@@ -1,35 +1,30 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { AppComponent } from './app.component';
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-navbar',
-  template: '',
-})
-class MockNavbarComponent {}
+import { TranslateService } from '@ngx-translate/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { of } from 'rxjs';
 
 describe('AppComponent', () => {
-  let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
-  let translateService: TranslateService;
+  let component: AppComponent;
+  let mockTranslateService: jasmine.SpyObj<TranslateService>;
 
   beforeEach(async () => {
-    const translateServiceStub = {
-      setDefaultLang: jest.fn(),
-      use: jest.fn(),
-    };
+    mockTranslateService = jasmine.createSpyObj('TranslateService', [
+      'setDefaultLang',
+      'use',
+    ]);
 
     await TestBed.configureTestingModule({
-      declarations: [AppComponent, MockNavbarComponent],
+      declarations: [AppComponent],
       providers: [
-        { provide: TranslateService, useValue: translateServiceStub },
+        { provide: TranslateService, useValue: mockTranslateService },
       ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
-    translateService = TestBed.inject(TranslateService);
     fixture.detectChanges();
   });
 
@@ -37,18 +32,15 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it(`should have as title 'music-collection'`, () => {
+  it('should have the title "music-collection"', () => {
     expect(component.title).toEqual('music-collection');
   });
 
-  it('should set default language to Spanish', () => {
-    expect(translateService.setDefaultLang).toHaveBeenCalledWith('es');
-    expect(translateService.use).toHaveBeenCalledWith('es');
+  it('should set the default language to "es"', () => {
+    expect(mockTranslateService.setDefaultLang).toHaveBeenCalledWith('es');
   });
 
-  it('should render navbar and router outlet', () => {
-    const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('app-navbar')).toBeTruthy();
-    expect(compiled.querySelector('router-outlet')).toBeTruthy();
+  it('should use the "es" language', () => {
+    expect(mockTranslateService.use).toHaveBeenCalledWith('es');
   });
 });

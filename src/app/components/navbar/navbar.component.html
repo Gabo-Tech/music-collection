@@ -1,26 +1,89 @@
 <div class="navbar__container">
-  <button (click)="toggleMenu()" class="navbar__toggle-button" aria-label="Toggle menu">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+  <button
+    (click)="toggleMenu()"
+    class="navbar__toggle-button"
+    aria-label="Toggle menu"
+  >
+    <svg
+      class="w-6 h-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M4 6h16M4 12h16m-7 6h7"
+      ></path>
     </svg>
   </button>
   <div class="navbar__title">{{ pageTitle$ | async }}</div>
-  <nav class="navbar__links navbar__links--space-x-4" aria-label="Main navigation">
-    <a routerLink="/songs" routerLinkActive="font-bold">{{ 'SONGS' | translate }}</a>
-    <a routerLink="/artists" routerLinkActive="font-bold">{{ 'ARTISTS' | translate }}</a>
-    <a routerLink="/companies" routerLinkActive="font-bold">{{ 'COMPANIES' | translate }}</a>
+  <nav
+    class="navbar__links navbar__links--space-x-4"
+    aria-label="Main navigation"
+  >
+    <a routerLink="/songs" routerLinkActive="font-bold">{{
+      'SONGS' | translate
+    }}</a>
+    <a routerLink="/artists" routerLinkActive="font-bold">{{
+      'ARTISTS' | translate
+    }}</a>
+    <a routerLink="/companies" routerLinkActive="font-bold">{{
+      'COMPANIES' | translate
+    }}</a>
   </nav>
 </div>
 
-<div [ngClass]="{ 'navbar__sidebar--hidden': !menuOpen, 'navbar__sidebar--visible': menuOpen }" class="navbar__sidebar">
+<div
+  [ngClass]="{
+    'navbar__sidebar--hidden': !menuOpen,
+    'navbar__sidebar--visible': menuOpen,
+  }"
+  class="navbar__sidebar"
+>
   <div class="navbar__sidebar-content navbar__sidebar-content--space-y-4">
-    <button (click)="toggleMenu()" class="navbar__sidebar-close-button" aria-label="Close menu">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    <button
+      (click)="toggleMenu()"
+      class="navbar__sidebar-close-button"
+      aria-label="Close menu"
+    >
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
       </svg>
     </button>
-    <a routerLink="/songs" routerLinkActive="font-bold" (click)="toggleMenu()" class="navbar__sidebar-link">{{ 'SONGS' | translate }}</a>
-    <a routerLink="/artists" routerLinkActive="font-bold" (click)="toggleMenu()" class="navbar__sidebar-link">{{ 'ARTISTS' | translate }}</a>
-    <a routerLink="/companies" routerLinkActive="font-bold" (click)="toggleMenu()" class="navbar__sidebar-link">{{ 'COMPANIES' | translate }}</a>
+    <a
+      routerLink="/songs"
+      routerLinkActive="font-bold"
+      (click)="toggleMenu()"
+      class="navbar__sidebar-link"
+      >{{ 'SONGS' | translate }}</a
+    >
+    <a
+      routerLink="/artists"
+      routerLinkActive="font-bold"
+      (click)="toggleMenu()"
+      class="navbar__sidebar-link"
+      >{{ 'ARTISTS' | translate }}</a
+    >
+    <a
+      routerLink="/companies"
+      routerLinkActive="font-bold"
+      (click)="toggleMenu()"
+      class="navbar__sidebar-link"
+      >{{ 'COMPANIES' | translate }}</a
+    >
   </div>
 </div>

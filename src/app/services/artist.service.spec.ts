@@ -8,7 +8,11 @@ import { ArtistService } from './artist.service';
 describe('ArtistService', () => {
   let service: ArtistService;
   let httpMock: HttpTestingController;
-  const apiUrl = 'http://localhost:3000/artists';
+
+  const mockArtists = [
+    { id: 1, name: 'Artist 1' },
+    { id: 2, name: 'Artist 2' },
+  ];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -21,71 +25,71 @@ describe('ArtistService', () => {
   });
 
   afterEach(() => {
-    httpMock.verify(); 
+    httpMock.verify();
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should fetch artists', () => {
-    const mockArtists = [
-      { id: 1, name: 'Artist 1', genre: 'Pop' },
-      { id: 2, name: 'Artist 2', genre: 'Rock' },
-    ];
-
+  it('should retrieve artists from the API via GET', () => {
     service.getArtists().subscribe((artists) => {
       expect(artists.length).toBe(2);
       expect(artists).toEqual(mockArtists);
     });
 
-    const req = httpMock.expectOne(apiUrl);
+    const req = httpMock.expectOne(service['apiUrl']);
     expect(req.request.method).toBe('GET');
     req.flush(mockArtists);
   });
 
-  it('should fetch a single artist', () => {
-    const mockArtist = { id: 1, name: 'Artist 1', genre: 'Pop' };
+  it('should retrieve a single artist by id from the API via GET', () => {
+    const artistId = 1;
+    const mockArtist = { id: artistId, name: 'Artist 1' };
 
-    service.getArtist(1).subscribe((artist) => {
+    service.getArtist(artistId).subscribe((artist) => {
       expect(artist).toEqual(mockArtist);
     });
 
-    const req = httpMock.expectOne(`${apiUrl}/1`);
+    const req = httpMock.expectOne(`${service['apiUrl']}/${artistId}`);
     expect(req.request.method).toBe('GET');
     req.flush(mockArtist);
   });
 
-  it('should add a new artist', () => {
-    const newArtist = { name: 'New Artist', genre: 'Jazz' };
+  it('should add a new artist via POST', () => {
+    const newArtist = { name: 'New Artist' };
 
     service.addArtist(newArtist).subscribe((artist) => {
-      expect(artist).toEqual(newArtist);
+      expect(artist).toEqual({ id: 3, ...newArtist });
     });
 
-    const req = httpMock.expectOne(apiUrl);
+    const req = httpMock.expectOne(service['apiUrl']);
     expect(req.request.method).toBe('POST');
-    req.flush(newArtist);
+    req.flush({ id: 3, ...newArtist });
   });
 
-  it('should update an artist', () => {
-    const updatedArtist = { id: 1, name: 'Updated Artist', genre: 'Jazz' };
+  it('should update an artist via PUT', () => {
+    const updatedArtist = { id: 1, name: 'Updated Artist' };
 
-    service.updateArtist(1, updatedArtist).subscribe((response) => {
-      expect(response).toEqual(updatedArtist);
-    });
+    service
+      .updateArtist(updatedArtist.id, updatedArtist)
+      .subscribe((artist) => {
+        expect(artist).toEqual(updatedArtist);
+      });
 
-    const req = httpMock.expectOne(`${apiUrl}/1`);
+    const req = httpMock.expectOne(`${service['apiUrl']}/${updatedArtist.id}`);
     expect(req.request.method).toBe('PUT');
     req.flush(updatedArtist);
   });
 
-  it('should delete an artist', () => {
-    service.deleteArtist(1).subscribe((response) => {
+  it('should delete an artist via DELETE', () => {
+    const artistId = 1;
+
+    service.deleteArtist(artistId).subscribe((response) => {
       expect(response).toEqual({});
     });
 
-    const req = httpMock.expectOne(`${apiUrl}/1`);
+    const req = httpMock.expectOne(`${service['apiUrl']}/${artistId}`);
     expect(req.request.method).toBe('DELETE');
     req.flush({});
   });

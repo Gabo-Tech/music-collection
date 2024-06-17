@@ -3,7 +3,7 @@
     {
       "id": 1,
       "title": "Who did you think i was",
-      "poster": "http://dummyimage.com/400x600.png/cc0000/ffffff",
+      "poster": "https://dummyimage.com/400x600.png/cc0000/ffffff",
       "genre": [
         "Pop",
         "Rock",
@@ -17,7 +17,7 @@
     {
       "id": 2,
       "title": "Penny Lane",
-      "poster": "http://dummyimage.com/400x600.png/dddddd/000000",
+      "poster": "https://dummyimage.com/400x600.png/dddddd/000000",
       "genre": [
         "Rock",
         "Pop",
@@ -31,7 +31,7 @@
     {
       "id": 3,
       "title": "Hey Jude",
-      "poster": "http://dummyimage.com/400x600.png/5fa2dd/ffffff",
+      "poster": "https://dummyimage.com/400x600.png/5fa2dd/ffffff",
       "genre": [
         "Pop",
         "Rock",
@@ -45,7 +45,7 @@
     {
       "id": 4,
       "title": "(I Can't Get No) Satisfaction",
-      "poster": "http://dummyimage.com/400x600.png/cc0000/ffffff",
+      "poster": "https://dummyimage.com/400x600.png/cc0000/ffffff",
       "genre": [
         "Rock",
         "Pop",
@@ -59,7 +59,7 @@
     {
       "id": 5,
       "title": "Where the Streets Have No Name",
-      "poster": "http://dummyimage.com/400x600.png/ff4444/ffffff",
+      "poster": "https://dummyimage.com/400x600.png/ff4444/ffffff",
       "genre": [
         "Rock",
         "Pop",
@@ -73,7 +73,7 @@
     {
       "id": 6,
       "title": "Who Says",
-      "poster": "http://dummyimage.com/400x600.png/dddddd/000000",
+      "poster": "https://dummyimage.com/400x600.png/dddddd/000000",
       "genre": [
         "Pop",
         "Romance"
@@ -86,7 +86,7 @@
     {
       "id": 7,
       "title": "With or without you",
-      "poster": "http://dummyimage.com/400x600.png/cc0000/ffffff",
+      "poster": "https://dummyimage.com/400x600.png/cc0000/ffffff",
       "genre": [
         "Rock",
         "Pop",
@@ -101,7 +101,7 @@
     {
       "id": 8,
       "title": "Start Me Up",
-      "poster": "http://dummyimage.com/400x600.png/ff4444/ffffff",
+      "poster": "https://dummyimage.com/400x600.png/ff4444/ffffff",
       "genre": [
         "Rock",
         "Blues",
@@ -115,7 +115,7 @@
     {
       "id": 9,
       "title": "1979",
-      "poster": "http://dummyimage.com/400x600.png/5fa2dd/ffffff",
+      "poster": "https://dummyimage.com/400x600.png/5fa2dd/ffffff",
       "genre": [
         "Alternative",
         "Psychedelic rock",
@@ -129,7 +129,7 @@
     {
       "id": 10,
       "title": "Voodoo Child",
-      "poster": "http://dummyimage.com/400x600.png/dddddd/000000",
+      "poster": "https://dummyimage.com/400x600.png/dddddd/000000",
       "genre": [
         "Blues",
         "Psychedelic rock",
@@ -143,7 +143,7 @@
     {
       "id": 11,
       "title": "Hey Joe",
-      "poster": "http://dummyimage.com/400x600.png/dddddd/000000",
+      "poster": "https://dummyimage.com/400x600.png/dddddd/000000",
       "genre": [
         "Blues",
         "Psychedelic rock",
@@ -170,7 +170,7 @@
       "name": "John Mayer",
       "bornCity": "Conecticut",
       "birthdate": "16/10/1977",
-      "img": "http://dummyimage.com/600x400.png/dddddd/000000",
+      "img": "https://dummyimage.com/600x400.png/dddddd/000000",
       "rating": 9.03,
       "songs": [
         1,
@@ -182,7 +182,7 @@
       "name": "The Beatles",
       "bornCity": "Liverpool",
       "birthdate": "19/04/1975",
-      "img": "http://dummyimage.com/600x400.png/5fa2dd/000000",
+      "img": "https://dummyimage.com/600x400.png/5fa2dd/000000",
       "rating": 2.43,
       "songs": [
         2,
@@ -207,7 +207,7 @@
       "name": "The Rolling Stones",
       "bornCity": "London",
       "birthdate": "04/08/1990",
-      "img": "http://dummyimage.com/600x400.png/4fa25d/000000",
+      "img": "https://dummyimage.com/600x400.png/4fa25d/000000",
       "rating": 4.37,
       "songs": [
         4,
@@ -219,7 +219,7 @@
       "name": "U2",
       "bornCity": "London",
       "birthdate": "30/12/1990",
-      "img": "https://dummyimage.com/600x400.png/2f125d/ffffff",
+      "img": "httpss://dummyimage.com/600x400.png/2f125d/ffffff",
       "rating": 3.92,
       "songs": [
         5,
@@ -231,7 +231,7 @@
       "name": "The Smashing Pumpkins",
       "bornCity": "Pitomača",
       "birthdate": "02/01/1968",
-      "img": "https://dummyimage.com/600x400.png/bf125d/ffffff",
+      "img": "httpss://dummyimage.com/600x400.png/bf125d/ffffff",
       "rating": 8.79,
       "songs": [
         9
@@ -242,7 +242,7 @@
       "name": "Jimi Hendrix",
       "bornCity": "London",
       "birthdate": "28/10/1953",
-      "img": "https://dummyimage.com/600x400.png/1f12ff/ffffff",
+      "img": "httpss://dummyimage.com/600x400.png/1f12ff/ffffff",
       "rating": 10,
       "songs": [
         11,

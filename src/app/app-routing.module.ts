@@ -12,7 +12,11 @@ const routes: Routes = [
     component: SongFormComponent,
     data: { title: 'NEW_SONG' },
   },
-  { path: 'songs/:id', component: SongDetailComponent, data: { title: 'SONG_DETAIL' } },
+  {
+    path: 'songs/:id',
+    component: SongDetailComponent,
+    data: { title: 'SONG_DETAIL' },
+  },
   {
     path: 'songs/edit/:id',
     component: SongFormComponent,
@@ -32,12 +36,12 @@ const routes: Routes = [
   {
     path: '**',
     redirectTo: '/songs',
-    data: { title: 'SONGS' }
-  }
+    data: { title: 'SONGS' },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

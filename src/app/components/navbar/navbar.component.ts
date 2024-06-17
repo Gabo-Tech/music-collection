@@ -10,7 +10,7 @@ import { Observable, of } from 'rxjs';
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent implements OnInit {
   menuOpen = false;
@@ -27,28 +27,36 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.pageTitle$ = this.navbarService.title$.pipe(
-      map(title => title || ''),
-      mergeMap(title => {
+      map((title) => title || ''),
+      mergeMap((title) => {
         if (title) {
           return of(title);
         } else {
           return this.router.events.pipe(
-            filter(event => event instanceof NavigationEnd),
+            filter((event) => event instanceof NavigationEnd),
             map(() => this.activatedRoute),
-            map(route => {
+            map((route) => {
               while (route.firstChild) route = route.firstChild;
               return route;
             }),
-            mergeMap(route => route.data),
-            mergeMap(data => this.translate.get(data['title']))
+            mergeMap((route) => route.data),
+            mergeMap((data) => {
+              console.log('Route data:', data);
+              const titleKey = data['title'] || 'DEFAULT_TITLE';
+              return this.translate.get(titleKey);
+            })
           );
         }
       })
     );
 
-    this.pageTitle$.subscribe(title => {
+    this.pageTitle$.subscribe((title) => {
+      console.log('Translated title:', title);
       this.titleService.setTitle(title);
-      this.metaService.updateTag({ name: 'description', content: `Current page: ${title}` });
+      this.metaService.updateTag({
+        name: 'description',
+        content: `Current page: ${title}`,
+      });
     });
   }
 

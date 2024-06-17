@@ -1,73 +1,69 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NavbarComponent } from './navbar.component';
+import { RouterTestingModule } from '@angular/router/testing';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NavbarService } from 'src/app/services/navbar.service';
 import { Meta, Title } from '@angular/platform-browser';
 import { of } from 'rxjs';
-import { NavbarComponent } from './navbar.component';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
   let fixture: ComponentFixture<NavbarComponent>;
-  let routerMock: any;
-  let activatedRouteMock: any;
-  let translateServiceMock: any;
-  let navbarServiceMock: any;
+  let navbarServiceStub: Partial<NavbarService>;
   let metaService: Meta;
   let titleService: Title;
 
-  beforeEach(waitForAsync(() => {
-    routerMock = {
-      events: of(new NavigationEnd(0, '', '')),
-      navigate: jasmine.createSpy('navigate')
+  beforeEach(async () => {
+    navbarServiceStub = {
+      title$: of('Test Title'),
     };
-    activatedRouteMock = { snapshot: { paramMap: { get: jasmine.createSpy('get').and.returnValue('') } } };
-    translateServiceMock = { get: jasmine.createSpy('get').and.returnValue(of('Translated Title')) };
-    navbarServiceMock = { title$: of('Test Title') };
 
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       declarations: [NavbarComponent],
+      imports: [RouterTestingModule, TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useValue: routerMock },
-        { provide: ActivatedRoute, useValue: activatedRouteMock },
-        { provide: TranslateService, useValue: translateServiceMock },
-        { provide: NavbarService, useValue: navbarServiceMock },
+        { provide: NavbarService, useValue: navbarServiceStub },
         Meta,
-        Title
-      ]
+        Title,
+        TranslateService,
+      ],
     }).compileComponents();
 
-    metaService = TestBed.inject(Meta);
-    titleService = TestBed.inject(Title);
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
+    metaService = TestBed.inject(Meta);
+    titleService = TestBed.inject(Title);
     fixture.detectChanges();
   });
 
-  it('should create the component', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with the correct page title', () => {
+  it('should toggle menu', () => {
+    expect(component.menuOpen).toBe(false);
+    component.toggleMenu();
+    expect(component.menuOpen).toBe(true);
+    component.toggleMenu();
+    expect(component.menuOpen).toBe(false);
+  });
+
+  it('should set the page title and meta description', () => {
     component.ngOnInit();
-    component.pageTitle$.subscribe(title => {
+    fixture.detectChanges();
+
+    component.pageTitle$.subscribe((title) => {
       expect(title).toBe('Test Title');
+      expect(titleService.getTitle()).toBe('Test Title');
+      const metaTag = metaService.getTag('name="description"');
+      expect(metaTag?.content).toBe('Current page: Test Title');
     });
   });
 
-  it('should set meta tags on init', () => {
-    component.ngOnInit();
-    expect(titleService.getTitle()).toBe('Test Title');
-    expect(metaService.getTag('name="description"')?.content).toBe('Current page: Test Title');
-  });
-
-  it('should toggle menuOpen state when toggleMenu is called', () => {
-    component.toggleMenu();
-    expect(component.menuOpen).toBeTrue();
-    component.toggleMenu();
-    expect(component.menuOpen).toBeFalse();
+  it('should render the navbar elements', () => {
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('.navbar__toggle-button')).toBeTruthy();
+    expect(compiled.querySelector('.navbar__title')).toBeTruthy();
+    expect(compiled.querySelectorAll('.navbar__links a').length).toBe(3);
   });
 });

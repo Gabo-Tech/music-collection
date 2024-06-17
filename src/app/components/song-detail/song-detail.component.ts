@@ -11,11 +11,11 @@ import { Song } from '../../../models/song.model';
   selector: 'app-song-detail',
   templateUrl: './song-detail.component.html',
   styleUrls: ['./song-detail.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SongDetailComponent implements OnInit {
-  song$: Observable<Song | null> = of(null); // Use the Song type
-  loading$ = new BehaviorSubject<boolean>(true); // BehaviorSubject to manage loading state
+  song$: Observable<Song | null> = of(null);
+  loading$ = new BehaviorSubject<boolean>(true);
   loaderType: string = '';
   progress: number = 0;
 
@@ -31,28 +31,30 @@ export class SongDetailComponent implements OnInit {
     this.selectRandomLoader();
     this.initializeProgress();
 
-    this.route.paramMap.pipe(
-      switchMap(params => {
-        const id = params.get('id');
-        if (id) {
-          return this.songService.getSong(+id).pipe(
-            map((data: Song) => {
-              this.navbarService.setTitle(data.title);
-              this.setMetaTags(data.title, data.genre.join(', '));
-              this.loading$.next(false);
-              return data;
-            }),
-            catchError(() => {
-              this.loading$.next(false);
-              return of(null);
-            })
-          );
-        } else {
-          this.loading$.next(false);
-          return of(null);
-        }
-      })
-    ).subscribe(song => this.song$ = of(song));
+    this.route.paramMap
+      .pipe(
+        switchMap((params) => {
+          const id = params.get('id');
+          if (id) {
+            return this.songService.getSong(+id).pipe(
+              map((data: Song) => {
+                this.navbarService.setTitle(data.title);
+                this.setMetaTags(data.title, data.genre.join(', '));
+                this.loading$.next(false);
+                return data;
+              }),
+              catchError(() => {
+                this.loading$.next(false);
+                return of(null);
+              })
+            );
+          } else {
+            this.loading$.next(false);
+            return of(null);
+          }
+        })
+      )
+      .subscribe((song) => (this.song$ = of(song)));
   }
 
   private selectRandomLoader(): void {
@@ -78,6 +80,9 @@ export class SongDetailComponent implements OnInit {
 
   private setMetaTags(title: string, genre: string): void {
     this.titleService.setTitle(`${title} - Song Details`);
-    this.metaService.updateTag({ name: 'description', content: `Details of the song ${title}, a ${genre} track.` });
+    this.metaService.updateTag({
+      name: 'description',
+      content: `Details of the song ${title}, a ${genre} track.`,
+    });
   }
 }

@@ -1,14 +1,29 @@
 <div class="p-4">
   <div *ngIf="loading; else loadedContent" role="alert" aria-live="assertive">
     <ng-container [ngSwitch]="loaderType">
-      <div *ngSwitchCase="'skeleton'" class="mt-4" aria-label="Loading content, please wait...">
+      <div
+        *ngSwitchCase="'skeleton'"
+        class="mt-4"
+        aria-label="Loading content, please wait..."
+      >
         <app-skeleton-loader></app-skeleton-loader>
       </div>
-      <div *ngSwitchCase="'spinner'" class="text-center mt-4" aria-label="Loading content, please wait...">
+      <div
+        *ngSwitchCase="'spinner'"
+        class="text-center mt-4"
+        aria-label="Loading content, please wait..."
+      >
         <app-spinner-loader></app-spinner-loader>
       </div>
-      <div *ngSwitchCase="'progress'" class="mt-4" aria-label="Loading progress">
-        <app-progress-bar [progress]="progress" [duration]="2000"></app-progress-bar>
+      <div
+        *ngSwitchCase="'progress'"
+        class="mt-4"
+        aria-label="Loading progress"
+      >
+        <app-progress-bar
+          [progress]="progress"
+          [duration]="2000"
+        ></app-progress-bar>
       </div>
     </ng-container>
   </div>
@@ -24,7 +39,13 @@
           class="p-2 border rounded"
           aria-required="true"
         />
-        <div *ngIf="songForm.get('title')?.invalid && (songForm.get('title')?.dirty || songForm.get('title')?.touched)" class="text-red-600">
+        <div
+          *ngIf="
+            songForm.get('title')?.invalid &&
+            (songForm.get('title')?.dirty || songForm.get('title')?.touched)
+          "
+          class="text-red-600"
+        >
           Title is required.
         </div>
       </div>
@@ -37,7 +58,13 @@
           class="p-2 border rounded"
           aria-required="true"
         />
-        <div *ngIf="songForm.get('genre')?.invalid && (songForm.get('genre')?.dirty || songForm.get('genre')?.touched)" class="text-red-600">
+        <div
+          *ngIf="
+            songForm.get('genre')?.invalid &&
+            (songForm.get('genre')?.dirty || songForm.get('genre')?.touched)
+          "
+          class="text-red-600"
+        >
           Genre is required.
         </div>
       </div>
@@ -50,7 +77,13 @@
           class="p-2 border rounded"
           aria-required="true"
         />
-        <div *ngIf="songForm.get('year')?.invalid && (songForm.get('year')?.dirty || songForm.get('year')?.touched)" class="text-red-600">
+        <div
+          *ngIf="
+            songForm.get('year')?.invalid &&
+            (songForm.get('year')?.dirty || songForm.get('year')?.touched)
+          "
+          class="text-red-600"
+        >
           Year is required and must be between 1900 and {{ currentYear }}.
         </div>
       </div>
@@ -63,7 +96,14 @@
           class="p-2 border rounded"
           aria-required="true"
         />
-        <div *ngIf="songForm.get('duration')?.invalid && (songForm.get('duration')?.dirty || songForm.get('duration')?.touched)" class="text-red-600">
+        <div
+          *ngIf="
+            songForm.get('duration')?.invalid &&
+            (songForm.get('duration')?.dirty ||
+              songForm.get('duration')?.touched)
+          "
+          class="text-red-600"
+        >
           Duration is required.
         </div>
       </div>
@@ -77,7 +117,13 @@
           class="p-2 border rounded"
           aria-required="true"
         />
-        <div *ngIf="songForm.get('rating')?.invalid && (songForm.get('rating')?.dirty || songForm.get('rating')?.touched)" class="text-red-600">
+        <div
+          *ngIf="
+            songForm.get('rating')?.invalid &&
+            (songForm.get('rating')?.dirty || songForm.get('rating')?.touched)
+          "
+          class="text-red-600"
+        >
           Rating is required and must be between 0 and 5.
         </div>
       </div>
@@ -90,11 +136,21 @@
           class="p-2 border rounded"
           aria-required="true"
         />
-        <div *ngIf="songForm.get('artist')?.invalid && (songForm.get('artist')?.dirty || songForm.get('artist')?.touched)" class="text-red-600">
+        <div
+          *ngIf="
+            songForm.get('artist')?.invalid &&
+            (songForm.get('artist')?.dirty || songForm.get('artist')?.touched)
+          "
+          class="text-red-600"
+        >
           Artist is required.
         </div>
       </div>
-      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded" [disabled]="songForm.invalid">
+      <button
+        type="submit"
+        class="px-4 py-2 bg-blue-600 text-white rounded"
+        [disabled]="songForm.invalid"
+      >
         {{ isEdit ? 'Update' : 'Add' }}
       </button>
     </form>

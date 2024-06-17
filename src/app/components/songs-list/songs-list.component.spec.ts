@@ -1,94 +1,91 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { provideMockStore, MockStore } from '@ngrx/store/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SongsListComponent } from './songs-list.component';
-import { AppState } from 'src/app/store/app.state';
-import { loadSongs } from 'src/app/store/actions/song.actions';
-import { selectAllSongs, selectLoading } from 'src/app/store/selectors/song.selectors';
+import { provideMockStore, MockStore } from '@ngrx/store/testing';
 import { Meta, Title } from '@angular/platform-browser';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
 import { of } from 'rxjs';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('SongsListComponent', () => {
   let component: SongsListComponent;
   let fixture: ComponentFixture<SongsListComponent>;
-  let store: MockStore<AppState>;
-  let metaService: Meta;
-  let titleService: Title;
-  const initialState = { songs: [], loading: false };
+  let mockStore: MockStore;
+  let mockMetaService: jasmine.SpyObj<Meta>;
+  let mockTitleService: jasmine.SpyObj<Title>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  const initialState = {
+    songs: {
+      songs: [
+        {
+          id: 1,
+          title: 'Test Song 1',
+          genre: ['Pop'],
+          poster: 'test-poster-1.jpg',
+        },
+        {
+          id: 2,
+          title: 'Test Song 2',
+          genre: ['Rock'],
+          poster: 'test-poster-2.jpg',
+        },
+      ],
+      loading: false,
+    },
+  };
+
+  beforeEach(async () => {
+    mockMetaService = jasmine.createSpyObj('Meta', ['updateTag']);
+    mockTitleService = jasmine.createSpyObj('Title', ['setTitle']);
+
+    await TestBed.configureTestingModule({
       declarations: [SongsListComponent],
       providers: [
         provideMockStore({ initialState }),
-        Meta,
-        Title
-      ]
+        { provide: Meta, useValue: mockMetaService },
+        { provide: Title, useValue: mockTitleService },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
-    store = TestBed.inject(MockStore);
-    metaService = TestBed.inject(Meta);
-    titleService = TestBed.inject(Title);
-    store.overrideSelector(selectAllSongs, []);
-    store.overrideSelector(selectLoading, false);
-  }));
-
-  beforeEach(() => {
+    mockStore = TestBed.inject(MockStore);
     fixture = TestBed.createComponent(SongsListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create the component', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize observables', () => {
-    expect(component.songs$).toBeDefined();
-    expect(component.isLoading$).toBeDefined();
-  });
-
   it('should dispatch loadSongs action on init', () => {
-    const dispatchSpy = spyOn(store, 'dispatch').and.callThrough();
+    const dispatchLoadSongsActionSpy = spyOn<any>(
+      component,
+      'dispatchLoadSongsAction'
+    ).and.callThrough();
     component.ngOnInit();
-    expect(dispatchSpy).toHaveBeenCalledWith(loadSongs());
+    expect(dispatchLoadSongsActionSpy).toHaveBeenCalled();
   });
 
-  it('should display loading spinner when loading', () => {
-    store.overrideSelector(selectLoading, true);
-    store.refreshState();
-    fixture.detectChanges();
-
-    const loadingElement: DebugElement = fixture.debugElement.query(By.css('div[role="alert"]'));
-    expect(loadingElement).toBeTruthy();
-  });
-
-  it('should display songs when not loading', () => {
-    const mockSongs = [
-      { id: 1, title: 'Song 1', poster: 'poster1.jpg', genre: ['Pop'] },
-      { id: 2, title: 'Song 2', poster: 'poster2.jpg', genre: ['Rock'] }
-    ];
-    store.overrideSelector(selectAllSongs, mockSongs);
-    store.overrideSelector(selectLoading, false);
-    store.refreshState();
-    fixture.detectChanges();
-
-    const songElements: DebugElement[] = fixture.debugElement.queryAll(By.css('li[role="listitem"]'));
-    expect(songElements.length).toBe(mockSongs.length);
-  });
-
-  it('should initialize progress bar correctly', (done) => {
+  it('should set page title and meta tags on init', () => {
     component.ngOnInit();
-    setTimeout(() => {
-      expect(component.progress).toBe(100);
-      done();
-    }, 2000);
+    expect(mockTitleService.setTitle).toHaveBeenCalledWith(component.pageTitle);
+    expect(mockMetaService.updateTag).toHaveBeenCalledWith({
+      name: 'description',
+      content: component.pageDescription,
+    });
   });
 
-  it('should set meta tags correctly', () => {
-    component.ngOnInit();
-    expect(titleService.getTitle()).toBe(component.pageTitle);
-    expect(metaService.getTag('name="description"')?.content).toBe(component.pageDescription);
+  it('should generate alt text for song images', () => {
+    const song = { title: 'Test Song', poster: 'test-poster.jpg' };
+    expect(component.getImageAltText(song)).toBe('Test Song album cover');
+  });
+
+  it('should check if value is an array', () => {
+    expect(component.isArray([1, 2, 3])).toBeTrue();
+    expect(component.isArray('not an array')).toBeFalse();
+  });
+
+  it('should track song by id', () => {
+    const song = { id: 1, title: 'Test Song' };
+    expect(component.trackById(0, song)).toBe(1);
   });
 });

@@ -1,6 +1,6 @@
 export interface Artist {
-    id: number;
-    name: string;
-    img: string;
-    bornCity: string;
-  }
+  id: number;
+  name: string;
+  img: string;
+  bornCity: string;
+}
